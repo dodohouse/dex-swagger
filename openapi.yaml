@@ -1,0 +1,49 @@
+openapi: 3.0.3
+info:
+  title: Dex
+  description: |-
+    Swagger for dexx
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://dodohouse.github.io/dex-swagger/
+tags:
+  - name: course
+paths:
+  /courses:
+    get:
+      summary: Get All Courses
+      description: Retrieve a list of all courses.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              example:
+                courses:
+                  - course_id: CSCI101
+                    name: Introduction to Computer Science
+                    description: Fundamental concepts of programming
+                    credits: 3
+                    level: Undergraduate
+                    type: Lecture
+                  - course_id: PSYC200
+                    name: Introduction to Psychology
+                    description: Overview of psychological principles
+                    credits: 3
+                    level: Undergraduate
+                    type: Lecture
+                  - course_id: MECH301
+                    name: Thermodynamics
+                    description: Study of heat and energy transfer
+                    credits: 4
+                    level: Undergraduate
+                    type: Lecture
