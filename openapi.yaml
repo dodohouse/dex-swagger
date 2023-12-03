@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Dex
   description: |-
-    Swagger for dexx
+    Swagger for Dex
   termsOfService: http://swagger.io/terms/
   contact:
     email: apiteam@swagger.io
@@ -16,12 +16,25 @@ externalDocs:
 servers:
   - url: https://dodohouse.github.io/dex-swagger/
 tags:
-  - name: course
+  - name: Courses
+    description: Operations related to courses
+  - name: Registrations
+    description: Operations related to student registrations
+  - name: Students
+    description: Operations related to students
 paths:
   /courses:
     get:
-      summary: Get All Courses
-      description: Retrieve a list of all courses.
+      tags:
+        - Courses
+      summary: List of courses by current professor for chosen semester
+      parameters:
+        - name: semester
+          in: query
+          description: The chosen semester for which courses are to be listed
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Successful response
@@ -29,21 +42,289 @@ paths:
             application/json:
               example:
                 courses:
-                  - course_id: CSCI101
+                  - course_id: ABC123
                     name: Introduction to Computer Science
-                    description: Fundamental concepts of programming
+                    description: An introduction to the basics of computer science.
                     credits: 3
                     level: Undergraduate
                     type: Lecture
-                  - course_id: PSYC200
-                    name: Introduction to Psychology
-                    description: Overview of psychological principles
-                    credits: 3
-                    level: Undergraduate
-                    type: Lecture
-                  - course_id: MECH301
-                    name: Thermodynamics
-                    description: Study of heat and energy transfer
+                    sections:
+                      - section_id: XYZ789
+                        start_time: "10:00 AM"
+                        end_time: "11:30 AM"
+                        days: "MWF"
+                        location: "Room 101"
+                        seat_capacity: 30
+                        seat_available: 10
+                      - section_id: UVW456
+                        start_time: "2:00 PM"
+                        end_time: "3:30 PM"
+                        days: "TR"
+                        location: "Room 102"
+                        seat_capacity: 25
+                        seat_available: 5
+                  - course_id: DEF456
+                    name: Data Structures
+                    description: Study of data organization, storage, and retrieval methods.
                     credits: 4
                     level: Undergraduate
-                    type: Lecture
+                    type: Lab
+                    sections:
+                      - section_id: PQR123
+                        start_time: "1:00 PM"
+                        end_time: "2:30 PM"
+                        days: "MWF"
+                        location: "Room 201"
+                        seat_capacity: 20
+                        seat_available: 15
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                error: "Invalid semester parameter"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              example:
+                error: "No courses found for the given semester or professor"
+  /courses/{id}/sections:
+    get:
+      tags:
+        - Courses
+      summary: List of sections for current professor and chosen course
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the course for which sections are to be listed
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              example:
+                sections:
+                  - section_id: XYZ789
+                    start_time: "10:00 AM"
+                    end_time: "11:30 AM"
+                    days: "MWF"
+                    location: "Room 101"
+                    seat_capacity: 30
+                    seat_available: 10
+                  - section_id: UVW456
+                    start_time: "2:00 PM"
+                    end_time: "3:30 PM"
+                    days: "TR"
+                    location: "Room 102"
+                    seat_capacity: 25
+                    seat_available: 5
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              example:
+                error: "No sections found for the given course or professor"
+  /registrations:
+    get:
+      tags:
+        - Registrations
+      summary: List of students for chosen section
+      parameters:
+        - name: section
+          in: query
+          description: The chosen section for which students are to be listed
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              example:
+                students:
+                  - student_id: ABC123
+                    email: student1@example.com
+                    first_name: John
+                    last_name: Doe
+                    street1: 123 Main St
+  /students/{id}:
+    get:
+      tags:
+        - Students
+      summary: Student details and grades for chosen student
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the student for whom details and grades are to be retrieved
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              example:
+                student_id: ABC123
+                email: student1@example.com
+                first_name: John
+                last_name: Doe
+                street1: 123 Main St
+                city: Anytown
+                state: CA
+                zip_code: 12345
+                date_of_birth: "1990-01-01"
+                phone_number: "123-456-7890"
+                grades:
+                  - course_id: XYZ789
+                    course_name: Introduction to Computer Science
+                    grade: A
+                  - course_id: DEF456
+                    course_name: Data Structures
+                    grade: B+
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              example:
+                error: "Student not found for the given ID"
+  /courses/{id}:
+    patch:
+      tags:
+        - Courses
+      summary: Edit a course details
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the course to be edited
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Course details to be updated
+        required: true
+        content:
+          application/json:
+            example:
+              name: Updated Course Name
+              description: Updated course description.
+              credits: 4
+              level: Undergraduate
+              type: Lab
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              example:
+                message: "Course details updated successfully"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                error: "Invalid request format"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              example:
+                error: "Course not found for the given ID"
+  /courses/{courseId}/sections/{sectionId}:
+    patch:
+      tags:
+        - Courses
+      summary: Edit a section details
+      parameters:
+        - name: courseId
+          in: path
+          description: The ID of the course to which the section belongs
+          required: true
+          schema:
+            type: string
+        - name: sectionId
+          in: path
+          description: The ID of the section to be edited
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Section details to be updated
+        required: true
+        content:
+          application/json:
+            example:
+              start_time: "9:00 AM"
+              end_time: "10:30 AM"
+              days: "MWF"
+              location: "Updated Room 101"
+              seat_capacity: 35
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              example:
+                message: "Section details updated successfully"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                error: "Invalid request format"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              example:
+                error: "Section not found for the given course and section IDs"
+  /students/courses:
+    get:
+      tags:
+        - Students
+      summary: List of registered courses and sections for current student
+      parameters:
+        - name: student_id
+          in: query
+          description: The ID of the student for whom registrations are to be listed
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              example:
+                courses:
+                  - course_id: ABC123
+                    course_name: Introduction to Computer Science
+                    section_id: XYZ789
+                    start_time: "10:00 AM"
+                    end_time: "11:30 AM"
+                    days: "MWF"
+                    location: "Room 101"
+                  - course_id: DEF456
+                    course_name: Data Structures
+                    section_id: UVW456
+                    start_time: "2:00 PM"
+                    end_time: "3:30 PM"
+                    days: "TR"
+                    location: "Room 102"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                error: "Invalid student_id parameter"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              example:
+                error: "No registrations found for the given student_id"
